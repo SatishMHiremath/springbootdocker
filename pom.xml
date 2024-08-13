@@ -51,7 +51,7 @@
 
     <build>
 
-        <finalName>spring-boot-web</finalName>
+        <finalName>springboot-github-action</finalName>
 
         <plugins>
             <plugin>
@@ -70,6 +70,4 @@
 
         </plugins>
     </build>
-
-
 </project>

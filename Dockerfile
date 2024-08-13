@@ -1,5 +1,5 @@
 FROM openjdk:8
 
-ADD target/spring-boot-web.jar spring-boot-web.jar
+ADD target/springboot-github-action.jar springboot-github-action.jar
 
-ENTRYPOINT ["java","-jar","/spring-boot-web.jar"]
+ENTRYPOINT ["java","-jar","/springboot-github-action.jar"]
