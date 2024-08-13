@@ -1,22 +1,13 @@
-# This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
-
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-
 name: Java CI with Maven
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,31 +18,42 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Build with Maven
-      run: mvn clean install
-    - name: Build & push Docker image
-      uses: mr-smithers-excellent/docker-build-push@v6
-      with:
-        image: satishmhiremath/springboot-github-action
-        tags: latest
-        registry: docker.io
-        dockerfile: Dockerfile
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build Project
+      run: mvn clean install -DskipTests
+
+    - name: Login to Docker Hub
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | sudo docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker image
+      run: sudo docker build -t satishmhiremath/springboot-github-action .
+
+    - name: Publish image to Docker Hub
+      run: sudo docker push satishmhiremath/springboot-github-action:latest
 
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: ubuntu-latest
 
     steps:
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+
+    - name: Fix Docker socket permissions
+      run: sudo chmod 666 /var/run/docker.sock
+
     - name: Pull Image from Docker Hub
-      run: docker pull satishmhiremath/springboot-github-action:latest
+      run: sudo docker pull satishmhiremath/springboot-github-action:latest
 
     - name: Delete old container
-      run: docker rm -f springboot-github-action-container
+      run: sudo docker rm -f springboot-github-action-container
 
     - name: Run Docker container
-      run: docker run -d -p 8080:8080 --name springboot-github-action-container satishmhiremath/springboot-github-action
+      run: sudo docker run -d -p 8080:8080 --name springboot-github-action-container satishmhiremath/springboot-github-action
 
     # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
