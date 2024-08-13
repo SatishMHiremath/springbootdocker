@@ -1,4 +1,4 @@
-FROM openjdk:8
+FROM openjdk:11-jre-slim
 
 ADD target/springboot-github-action.jar springboot-github-action.jar
 
