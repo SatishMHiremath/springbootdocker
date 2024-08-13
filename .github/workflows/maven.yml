@@ -10,13 +10,12 @@ name: Java CI with Maven
 
 on:
   push:
-    branches: [ "master" ]
+    branches: ["master"]
   pull_request:
-    branches: [ "master" ]
+    branches: ["master"]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
 
     steps:
@@ -27,6 +26,7 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
+
     - name: Build Project
       run: mvn clean install -DskipTests
 
@@ -41,9 +41,16 @@ jobs:
 
   deploy:
     needs: build
-    runs-on: [aws-ec2]
+    runs-on: ubuntu-latest # Ensure you're using an image with Docker support or install it
 
     steps:
+    - name: Install Docker
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y docker.io
+        sudo systemctl start docker
+        sudo systemctl enable docker
+
     - name: Pull Image from Docker Hub
       run: docker pull satishmhiremath/springboot-github-action:latest
 
