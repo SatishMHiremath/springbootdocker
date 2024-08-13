@@ -1,20 +1,17 @@
-package com.mkyong;
+package com.api;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @SpringBootApplication
-@Controller
+@RestController
 public class StartApplication {
 
-    @GetMapping("/")
-    public String index(final Model model) {
-        model.addAttribute("title", "Docker + Spring Boot");
-        model.addAttribute("msg", "Welcome to the docker container!");
-        return "index";
+    @GetMapping("/message")
+    public String displayMessg() {
+        return "Welcome to the springboot docker container deployed to k8!";
     }
 
     public static void main(String[] args) {
